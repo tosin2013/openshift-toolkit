@@ -31,32 +31,26 @@
     shell: "tar cf {{ dest_backup_dir }}/{{ tar_file_prefix }}-{{ inventory_hostname }}.tar *.crt"
     args:
       chdir: "{{ source_backup_dir }}"
-    when: not cleanup_temp_folder
   - name: Backup master keys (*.key)
     shell: "tar rf {{ dest_backup_dir }}/{{ tar_file_prefix }}-{{ inventory_hostname }}.tar *.key"
     args:
       chdir: "{{ source_backup_dir }}"
-    when: not cleanup_temp_folder
   - name: Compress tar file to create tar.gz
     shell: "gzip {{ dest_backup_dir }}/{{ tar_file_prefix }}-{{ inventory_hostname }}.tar"
     args:
       chdir: "{{ source_backup_dir }}"
-    when: not cleanup_temp_folder
   - name: Remove old tar file
     file:
       path: "{{ dest_backup_dir }}/{{ tar_file_prefix }}-{{ inventory_hostname }}.tar"
       state: absent
       recurse: no
-    when: not cleanup_temp_folder
   - name: Copy backup tar.gz back to ansible host machine
     fetch:
       src: "{{ dest_backup_dir }}/{{ tar_file_prefix }}-{{ inventory_hostname }}.tar.gz"
       dest: "{{ host_dest_dir }}"
       flat: yes
-    when: not cleanup_temp_folder
   - name: Remove temp tar.gz file from master
     file:
       path: "{{ dest_backup_dir }}/{{ tar_file_prefix }}-{{ inventory_hostname }}.tar.gz"
       state: absent
       recurse: no
-    when: not cleanup_temp_folder
